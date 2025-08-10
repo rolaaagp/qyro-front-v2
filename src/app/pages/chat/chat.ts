@@ -1,8 +1,10 @@
-import { Component } from '@angular/core';
-import { ReactiveFormsModule, FormControl } from '@angular/forms';
+import { Component, OnInit, inject, signal } from '@angular/core';
+import { ReactiveFormsModule, FormControl, FormGroup, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Chips } from '@components/chips/chips';
-import { Chip } from '@interfaces/chip.interface';
+import type { Chip } from '@interfaces/chip.interface';
+import { ChatService } from '@services/chat';
+import { retry } from 'rxjs';
 
 @Component({
   selector: 'app-chat',
@@ -11,18 +13,42 @@ import { Chip } from '@interfaces/chip.interface';
   templateUrl: './chat.html',
   styleUrls: ['./chat.css'],
 })
-export class Chat {
-  chipsControl = new FormControl<Chip[]>(
-    [
-      { id: 1, title: 'Hello' },
-      { id: 2, title: 'Test' },
-    ],
-    { nonNullable: true }
-  );
+export class Chat implements OnInit {
+  private chatService = inject(ChatService);
 
-  onRemoveChip(id: number) {
-    this.chipsControl.setValue(
-      this.chipsControl.value.filter((c) => c.id !== id)
-    );
+  chips = signal<Chip[]>([]);
+  createForm = new FormGroup({
+    title: new FormControl<string>('', { nonNullable: true, validators: [Validators.required, Validators.maxLength(120)] }),
+  });
+
+  ngOnInit(): void {
+    this.getChats();
+  }
+
+  getChats(): void {
+    this.chatService
+      .getAll()
+      .pipe(retry(1))
+      .subscribe({
+        next: (res) => {
+          const mapped = res.map(c => ({ id: c.id, title: c.title }));
+          this.chips.set(mapped);
+        },
+      });
+  }
+
+  onRemoveChip(id: number): void {
+    this.chips.update(list => list.filter(c => c.id !== id));
+  }
+
+  createChat(): void {
+    if (this.createForm.invalid) return;
+    const payload = { title: this.createForm.controls.title.value };
+    this.chatService.create(payload).subscribe({
+      next: (created) => {
+        this.chips.update(list => [{ id: created.id, title: created.title }, ...list]);
+        this.createForm.reset({ title: '' });
+      },
+    });
   }
 }

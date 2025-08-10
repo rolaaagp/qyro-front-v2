@@ -1,14 +1,17 @@
 <div class="flex gap-2 flex-wrap">
   <span
-    *ngFor="let c of items"
-    class="flex items-center gap-2 px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full"
+    *ngFor="let c of items; index as i"
+    class="opacity-0 will-change-transform flex items-center gap-2 px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full"
+    [ngStyle]="{
+      animation: 'fade-in-up 0.3s ease-out forwards',
+      animationDelay: (i * 60) + 'ms'
+    }"
   >
     {{ sliceText({ text: c.title, start: 0, end: 15 }) }}
     <button
       type="button"
-      class="text-blue-500 hover:text-blue-700 cursor-pointer select-none"
-      (click)="remove.emit(c.id)"
-    >
+      class="text-blue-500 hover:text-blue-700"
+      (click)="remove.emit(c.id)">
       &times;
     </button>
   </span>

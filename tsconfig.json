@@ -22,7 +22,9 @@
       "@pages/*": ["src/app/pages/*"],
       "@interfaces/*": ["src/app/interfaces/*"],
       "@pipes/*": ["src/app/pipes/*"],
-      "@guards/*": ["src/app/guards/*"]
+      "@guards/*": ["src/app/guards/*"],
+      "@environments/*": ["src/environments/*"],
+      "@context/*": ["src/app/context/*"]
     }
   },
   "angularCompilerOptions": {
@@ -42,3 +44,4 @@
     }
   ]
 }
+

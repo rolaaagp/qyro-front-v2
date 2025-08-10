@@ -1,8 +1,7 @@
-<article>
-  <!-- chips -->
-
-  <div class="flex gap-2 flex-wrap">
-    <app-chips [items]="chipsControl.value" (remove)="onRemoveChip($event)">
-    </app-chips>
+<article class="text-center mt-5">
+  <div class="flex justify-center pt-5 px-3">
+    <div class="flex gap-2 flex-wrap">
+      <app-chips [items]="chips()" (remove)="onRemoveChip($event)"> </app-chips>
+    </div>
   </div>
 </article>
