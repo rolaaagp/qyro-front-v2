@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
 import { ReactiveFormsModule, FormControl } from '@angular/forms';
-import { Chip } from '../../interfaces';
-import { Chips } from '../../src/app/components/chips/chips';
 import { CommonModule } from '@angular/common';
+import { Chips } from '@components/chips/chips';
+import { Chip } from '@interfaces/chip.interface';
 
 @Component({
   selector: 'app-chat',
@@ -17,12 +17,12 @@ export class Chat {
       { id: 1, title: 'Hello' },
       { id: 2, title: 'Test' },
     ],
-    { nonNullable: true },
+    { nonNullable: true }
   );
 
   onRemoveChip(id: number) {
     this.chipsControl.setValue(
-      this.chipsControl.value.filter((c) => c.id !== id),
+      this.chipsControl.value.filter((c) => c.id !== id)
     );
   }
 }

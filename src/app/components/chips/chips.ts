@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { Chip } from '../../../../interfaces';
 import { CommonModule } from '@angular/common';
-import { sliceText } from '../../../../utils';
+import { sliceText } from '@utils/text-utils';
+import { Chip } from '@interfaces/chip.interface';
 
 @Component({
   selector: 'app-chips',

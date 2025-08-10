@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { Main } from './pages/main/main';
+import { Main } from '@pages/main/main';
 
 export const routes: Routes = [
   {
@@ -14,7 +14,7 @@ export const routes: Routes = [
       },
       {
         path: 'chats',
-        loadComponent: () => import('./pages/chat/chat').then((m) => m.Chat),
+        loadComponent: () => import('@pages/chat/chat').then((m) => m.Chat),
       },
     ],
   },
