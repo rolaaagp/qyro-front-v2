@@ -1,18 +1,41 @@
-<div class="flex gap-2 flex-wrap">
-  <span
-    *ngFor="let c of items; index as i"
-    class="opacity-0 will-change-transform flex items-center gap-2 px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full"
-    [ngStyle]="{
-      animation: 'fade-in-up 0.3s ease-out forwards',
-      animationDelay: (i * 60) + 'ms'
-    }"
-  >
-    {{ sliceText({ text: c.title, start: 0, end: 15 }) }}
-    <button
-      type="button"
-      class="text-blue-500 hover:text-blue-700"
-      (click)="remove.emit(c.id)">
-      &times;
-    </button>
-  </span>
+<div class="flex gap-2 flex-wrap justify-center">
+  @if (selectedId === null) {
+    @for (c of items; track c.id; let i = $index) {
+      <span
+        class="opacity-0 will-change-transform flex items-center gap-2 px-3 py-1 rounded-full border cursor-pointer border-[color:var(--border)] bg-[color:var(--chip-bg)] text-[color:var(--chip-text)]"
+        [ngStyle]="{
+          animation: 'fade-in-up 0.3s ease-out forwards',
+          animationDelay: i * 60 + 'ms',
+        }"
+        (click)="toggleSelect(c.id)"
+      >
+        {{ sliceText({ text: c.title, start: 0, end: 15 }) }}
+        <button
+          type="button"
+          class="transition-colors text-[color:var(--primary)] hover:text-[color:var(--primary-600)]"
+          (click)="remove.emit(c.id); $event.stopPropagation()"
+          aria-label="Eliminar"
+        >
+          &times;
+        </button>
+      </span>
+    }
+  } @else {
+    <div class="flex justify-center">
+      <span
+        class="flex items-center gap-2 px-3 py-1 rounded-full border cursor-pointer border-[color:var(--border)] bg-[color:var(--chip-bg)] text-[color:var(--chip-text)]"
+        (click)="toggleSelect(selectedId!)"
+      >
+        {{ sliceText({ text: textSelected, start: 0, end: 15 }) }}
+        <button
+          type="button"
+          class="transition-colors text-[color:var(--primary)] hover:text-[color:var(--primary-600)]"
+          (click)="remove.emit(selectedId!); $event.stopPropagation()"
+          aria-label="Eliminar seleccionado"
+        >
+          &times;
+        </button>
+      </span>
+    </div>
+  }
 </div>

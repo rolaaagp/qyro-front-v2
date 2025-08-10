@@ -22,12 +22,12 @@ export class ToastService {
       visible: true,
     };
 
-    this.toasts.update(prev => [...prev, toast]);
+    this.toasts.update((prev) => [...prev, toast]);
     setTimeout(() => this.dismiss(id), toast.duration);
   }
 
   dismiss(id: string) {
-    this.toasts.update(prev => prev.filter(t => t.id !== id));
+    this.toasts.update((prev) => prev.filter((t) => t.id !== id));
   }
 
   get currentToasts(): Toast[] {

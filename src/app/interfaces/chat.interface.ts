@@ -8,3 +8,12 @@ export interface IChat {
   updated_at: string;
   correlative: number;
 }
+
+export interface IMessages {
+  id: number;
+  prompt: string;
+  response: string;
+  created_at: string;
+  updated_at: string;
+  chat?: IChat;
+}

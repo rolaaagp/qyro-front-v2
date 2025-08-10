@@ -25,11 +25,8 @@ export class AuthQyroService {
   constructor(private http: HttpClient) {}
 
   checkEmail(email: string): Observable<CheckEmailResponse> {
-    return this.http.post<CheckEmailResponse>(
-      `${this.baseUrl}/check-user/`,
-      {
-        email,
-      }
-    );
+    return this.http.post<CheckEmailResponse>(`${this.baseUrl}/check-user/`, {
+      email,
+    });
   }
 }

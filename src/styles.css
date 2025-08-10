@@ -1,4 +1,53 @@
 @import "tailwindcss";
+@import "highlight.js/styles/github-dark.css";
+
+:root {
+  --bg: #f8fafc;
+  --text: #0f172a;
+  --muted: #64748b;
+  --card: #ffffff;
+  --panel: #ffffffb3;
+  --border: #e2e8f0;
+  --chip-bg: #e5edff;
+  --chip-text: #1e3a8a;
+  --primary: #2563eb;
+  --primary-600: #1d4ed8;
+  --primary-contrast: #ffffff;
+  --sbw: 0px;
+}
+
+.dark {
+  --bg: #0b1220;
+  --text: #e5e7eb;
+  --muted: #9ca3af;
+  --card: #0f172a;
+  --panel: #0f172ab3;
+  --border: #1f2937;
+  --chip-bg: #12213a;
+  --chip-text: #93c5fd;
+  --primary: #3b82f6;
+  --primary-600: #2563eb;
+  --primary-contrast: #ffffff;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+}
+
+.dark .hljs {
+  background: #0b1220 !important;
+  color: #e5e7eb !important;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+}
 
 @keyframes fade-in-up {
   0% {

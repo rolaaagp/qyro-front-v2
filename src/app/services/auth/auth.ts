@@ -5,7 +5,7 @@ import { AuthQyroService } from './authQyro.service';
 import { ToastService } from '@services/toast/toast.service';
 import { SpinnerService } from '@services/spinners/spinner-overlay.service';
 import { UserContextService } from '@context/user.context';
-import { User } from '@interfaces/user.interface';
+import { User, UserWithToken } from '@interfaces/user.interface';
 import { Router } from '@angular/router';
 
 declare global {
@@ -25,7 +25,7 @@ export class AuthService {
   constructor(
     private authQyroService: AuthQyroService,
     private readonly spinnerService: SpinnerService,
-    private userContext: UserContextService
+    private userContext: UserContextService,
   ) {}
 
   async loadGoogleScript(): Promise<void> {
@@ -33,11 +33,11 @@ export class AuthService {
     if ((window as any).google?.accounts) return;
 
     const existing = this.doc.querySelector(
-      'script[src="https://accounts.google.com/gsi/client"]'
+      'script[src="https://accounts.google.com/gsi/client"]',
     );
     if (existing) {
       await new Promise<void>((res) =>
-        existing.addEventListener('load', () => res())
+        existing.addEventListener('load', () => res()),
       );
       return;
     }
@@ -76,11 +76,11 @@ export class AuthService {
     if (!this.isBrowser) return;
     if (!response?.credential) return;
 
-    const token = response.credential;
+    const tokenGoogle = response.credential;
     let email: string | undefined;
 
     try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
+      const payload = JSON.parse(atob(tokenGoogle.split('.')[1]));
       email = payload?.email;
       if (!email) throw new Error('Email no presente en token');
     } catch {
@@ -118,7 +118,9 @@ export class AuthService {
           return;
         }
 
-        this.storeTokenUser({ token, user: res.user });
+        this.storeTokenUser({
+          user: { ...res.user, tokenGoogle, token: res.token as string },
+        });
       },
       error: () => {
         this.toastService.show({
@@ -133,15 +135,10 @@ export class AuthService {
     });
   }
 
-  storeTokenUser(data: { token: string; user: User }): void {
-    this.userContext.currentUser = {
-      user: {
-        ...data.user,
-        token: data.token as string,
-      },
-    };
+  storeTokenUser(data: { user: UserWithToken }): void {
+    this.userContext.currentUser = { user: data.user };
     localStorage.setItem('email', data.user.email);
-    localStorage.setItem('token', data.token as string);
+    localStorage.setItem('token', data.user.token as string);
     this.loginRedirect();
   }
 

@@ -14,7 +14,7 @@ export const authGuard: CanActivateFn = async (route, state) => {
   if (typeof window === 'undefined')
     return router.createUrlTree(['/auth/login']);
 
-  const email = window.sessionStorage.getItem('email');
+  const email = window.localStorage.getItem('email');
   if (!email) return router.createUrlTree(['/auth/login']);
 
   try {
@@ -27,7 +27,7 @@ export const authGuard: CanActivateFn = async (route, state) => {
           token: res.token as string,
         },
       };
-      console.log(userContext.currentUser)
+      console.log(userContext.currentUser);
       return true;
     }
   } catch {

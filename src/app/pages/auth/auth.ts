@@ -5,17 +5,19 @@ import { AuthService } from '@services/auth';
 @Component({
   selector: 'app-auth',
   standalone: true,
-  templateUrl: './auth.html'
+  templateUrl: './auth.html',
 })
 export class Auth implements AfterViewInit {
   constructor(
     private auth: AuthService,
-    @Inject(PLATFORM_ID) private platformId: Object
+    @Inject(PLATFORM_ID) private platformId: Object,
   ) {}
 
   async ngAfterViewInit() {
     if (!isPlatformBrowser(this.platformId)) return;
     await this.auth.loadGoogleScript();
-    this.auth.initGoogleLogin((resp) => this.auth.handleGoogleCredentialResponse(resp));
+    this.auth.initGoogleLogin((resp) =>
+      this.auth.handleGoogleCredentialResponse(resp),
+    );
   }
 }

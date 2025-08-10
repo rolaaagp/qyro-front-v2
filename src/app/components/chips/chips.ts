@@ -11,7 +11,17 @@ import { Chip } from '@interfaces/chip.interface';
 })
 export class Chips {
   @Input({ required: true }) items: Chip[] = [];
+  @Input() selectedId: number | null = null;
   @Output() remove = new EventEmitter<number>();
+  @Output() select = new EventEmitter<number | null>();
 
   readonly sliceText = sliceText;
+
+  get textSelected(): string {
+    return this.items.find((c) => c.id === this.selectedId)?.title || '';
+  }
+
+  toggleSelect(id: number) {
+    this.select.emit(this.selectedId === id ? null : id);
+  }
 }

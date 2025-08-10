@@ -1,7 +1,160 @@
-<article class="text-center mt-5">
-  <div class="flex justify-center pt-5 px-3">
-    <div class="flex gap-2 flex-wrap">
-      <app-chips [items]="chips()" (remove)="onRemoveChip($event)"> </app-chips>
+<!-- contenido con espacio inferior para no tapar por el footer -->
+@if (confirm().open) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center">
+    <div class="absolute inset-0 bg-black/50"></div>
+    <div
+      class="relative w-full max-w-sm rounded-2xl border border-[color:var(--border)] bg-[color:var(--card)] text-[color:var(--text)] shadow-xl"
+    >
+      <div class="px-5 py-4 border-b border-[color:var(--border)]">
+        <h3 class="text-base font-semibold">
+          {{
+            confirm().action === "delete-chat"
+              ? "Eliminar chat"
+              : "Eliminar chip"
+          }}
+        </h3>
+      </div>
+      <div class="px-5 py-4 text-sm">
+        {{
+          confirm().action === "delete-chat"
+            ? "Esta acción eliminará el chat y sus mensajes."
+            : "Esta acción eliminará el chip de la lista."
+        }}
+      </div>
+      <div
+        class="px-5 py-4 flex justify-end gap-2 border-t border-[color:var(--border)]"
+      >
+        <button
+          type="button"
+          class="px-4 py-2 rounded-lg border border-[color:var(--border)]"
+          (click)="confirmNo()"
+        >
+          Cancelar
+        </button>
+        <button
+          type="button"
+          class="px-4 py-2 rounded-lg bg-[color:var(--primary)] text-[color:var(--primary-contrast)] hover:bg-[color:var(--primary-600)]"
+          (click)="confirmYes()"
+        >
+          Eliminar
+        </button>
+      </div>
     </div>
   </div>
-</article>
+}
+<section class="max-w-4xl mx-auto px-4 pt-4 pb-28">
+  <article class="text-center">
+    <div class="flex justify-center pt-5 px-3">
+      <div class="flex gap-2 flex-wrap">
+        <app-chips
+          [items]="chips()"
+          [selectedId]="selectedId()"
+          (remove)="onRemoveChipRequest($event)"
+          (select)="onSelectChip($event)"
+        >
+        </app-chips>
+      </div>
+    </div>
+  </article>
+
+  @if (selectedId() !== null) {
+    <section class="mt-8">
+      <div
+        class="rounded-3xl border shadow-lg border-[color:var(--border)] bg-[color:var(--panel)] backdrop-blur"
+      >
+        <header class="px-6 py-4 border-b border-[color:var(--border)]">
+          <h2 class="text-lg font-semibold text-[color:var(--text)]">
+            Mensajes
+          </h2>
+        </header>
+
+        <div class="p-6 space-y-5">
+          @if (hasMessages()) {
+            @for (m of selectedMessages(); track m.id; let i = $index) {
+              <div
+                class="opacity-0"
+                [ngStyle]="{
+                  animation: 'fade-in-up 0.3s ease-out forwards',
+                  animationDelay: i * 60 + 'ms',
+                }"
+              >
+                <div class="flex justify-end mb-1">
+                  <div
+                    class="max-w-[80%] rounded-2xl px-4 py-2 shadow-sm bg-[color:var(--primary)] text-[color:var(--primary-contrast)]"
+                  >
+                    <div class="text-sm leading-relaxed break-words">
+                      {{ m.prompt }}
+                    </div>
+                  </div>
+                </div>
+                <div class="flex justify-start">
+                  <div
+                    class="max-w-[100%] rounded-2xl px-4 py-2 mt-3 shadow-sm border bg-[color:var(--card)] border-[color:var(--border)] text-[color:var(--text)]"
+                  >
+                    <div
+                      class="text-sm leading-relaxed break-words"
+                      [innerHTML]="m.response | highlight"
+                    ></div>
+                    <div class="mt-2 text-[11px] text-[color:var(--muted)]">
+                      {{ m.created_at }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            }
+          } @else {
+            <div
+              class="rounded-xl border border-dashed px-4 py-8 text-center border-[color:var(--border)] text-[color:var(--muted)]"
+            >
+              No hay mensajes en este chat.
+            </div>
+          }
+        </div>
+      </div>
+    </section>
+  }
+</section>
+
+<!-- barra fija inferior -->
+<div
+  class="fixed inset-x-0 bottom-0 bg-[color:var(--bg)]/90 backdrop-blur border-t border-[color:var(--border)] [padding-bottom:env(safe-area-inset-bottom)]"
+>
+  <form
+    [formGroup]="createForm"
+    (ngSubmit)="sendMessage()"
+    class="mx-auto w-full max-w-md sm:max-w-lg md:max-w-xl lg:max-w-2xl px-3 sm:px-4 md:px-6 py-3"
+  >
+    <div class="relative">
+      <input
+        id="message"
+        type="text"
+        formControlName="message"
+        placeholder="Escribe un mensaje..."
+        class="w-full rounded-lg border pl-4 pr-12 py-3 sm:py-3.5 focus:outline-none focus:ring-2 border-[color:var(--border)] bg-[color:var(--card)] text-[color:var(--text)] focus:ring-[color:var(--primary)]"
+      />
+      <button
+        type="submit"
+        [disabled]="createForm.invalid"
+        class="absolute inset-y-0 right-2 flex items-center px-2 text-[color:var(--primary)] hover:text-[color:var(--primary-600)] disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-5 w-5 sm:h-6 sm:w-6 rotate-45"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M3 10h11M9 21V3m0 0l11 11m-11-11l-11 11"
+          />
+        </svg>
+      </button>
+    </div>
+  </form>
+</div>
+
+<!-- separador para que el fijo no tape el contenido -->
+<div class="h-20 sm:h-24 lg:h-28"></div>
