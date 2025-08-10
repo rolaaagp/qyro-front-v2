@@ -1,1 +1,8 @@
-<p>chat works!</p>
+<article>
+  <!-- chips -->
+
+  <div class="flex gap-2 flex-wrap">
+    <app-chips [items]="chipsControl.value" (remove)="onRemoveChip($event)">
+    </app-chips>
+  </div>
+</article>
