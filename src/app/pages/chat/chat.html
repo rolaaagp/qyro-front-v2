@@ -133,7 +133,7 @@
         formControlName="message"
         placeholder="Escribe un mensaje..."
         (input)="autoResize($event)"
-         (keydown.enter)="handleEnter($event)"
+        (keydown.enter)="handleEnter($event)"
         class="w-full max-h-[30dvh] rounded-lg border pl-4 pr-12 py-3 sm:py-3.5 focus:outline-none focus:ring-2 border-[color:var(--border)] bg-[color:var(--card)] text-[color:var(--text)] focus:ring-[color:var(--primary)] resize-none overflow-hidden"
       ></textarea>
       <button
@@ -141,44 +141,44 @@
         [disabled]="createForm.invalid || loadingChat"
         class="absolute inset-y-0 right-2 flex items-center px-2 text-[color:var(--primary)] hover:text-[color:var(--primary-600)] disabled:opacity-50 disabled:cursor-not-allowed"
       >
-         @if (loadingChat) {
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      class="h-5 w-5 sm:h-6 sm:w-6 animate-spin select-none"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-      stroke-width="2"
-    >
-      <circle
-        class="opacity-25"
-        cx="12"
-        cy="12"
-        r="10"
-        stroke="currentColor"
-      ></circle>
-      <path
-        class="opacity-75"
-        fill="currentColor"
-        d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8h4z"
-      ></path>
-    </svg>
-  } @else {
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      class="h-5 w-5 sm:h-6 sm:w-6 rotate-45 cursor-pointer select-none"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-      stroke-width="2"
-    >
-      <path
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        d="M3 10h11M9 21V3m0 0l11 11m-11-11l-11 11"
-      />
-    </svg>
-  }
+        @if (loadingChat) {
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5 sm:h-6 sm:w-6 animate-spin select-none"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <circle
+              class="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+            ></circle>
+            <path
+              class="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8h4z"
+            ></path>
+          </svg>
+        } @else {
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5 sm:h-6 sm:w-6 rotate-45 cursor-pointer select-none"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M3 10h11M9 21V3m0 0l11 11m-11-11l-11 11"
+            />
+          </svg>
+        }
       </button>
     </div>
   </form>
@@ -186,4 +186,3 @@
 
 <!-- separador para que el fijo no tape el contenido -->
 <div class="h-20 sm:h-24 lg:h-28"></div>
-
