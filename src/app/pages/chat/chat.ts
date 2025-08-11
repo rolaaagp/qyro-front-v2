@@ -33,6 +33,8 @@ export class Chat implements OnInit {
   chips = signal<ChipWithMessage[]>([]);
   selectedId = signal<number | null>(null);
 
+  loadingChat: boolean = false;
+
   selectedMessages = computed(() => {
     const id = this.selectedId();
     if (id === null) return [];
@@ -42,7 +44,7 @@ export class Chat implements OnInit {
   hasMessages = computed(() => this.selectedMessages().length > 0);
 
   confirm = signal<{ open: boolean; id: number | null; action: ConfirmAction }>(
-    { open: false, id: null, action: 'remove-chip' },
+    { open: false, id: null, action: 'remove-chip' }
   );
 
   createForm = new FormGroup({
@@ -74,7 +76,8 @@ export class Chat implements OnInit {
   }
 
   createChat(): void {
-    if (this.createForm.invalid) return;
+    if (this.createForm.invalid || this.loadingChat) return;
+    this.loadingChat = true;
     const payload = { title: this.createForm.controls.message.value };
     this.chatService
       .create({
@@ -90,6 +93,9 @@ export class Chat implements OnInit {
           ]);
           this.createForm.reset({ message: '' });
         },
+        complete: () => {
+          this.loadingChat = false;
+        },
       });
   }
 
@@ -100,16 +106,18 @@ export class Chat implements OnInit {
     this.chatService.getAllMessages(id).subscribe({
       next: (messages: IMessages[]) => {
         this.chips.update((list) =>
-          list.map((c) => (c.id === id ? { ...c, messages } : c)),
+          list.map((c) => (c.id === id ? { ...c, messages } : c))
         );
       },
     });
   }
 
   sendMessage(): void {
-    if (this.createForm.invalid) return;
+    if (this.createForm.invalid || this.loadingChat) return;
     const content = this.createForm.controls.message.value.trim();
     if (!content) return;
+
+    this.loadingChat = true;
 
     const sel = this.selectedId();
 
@@ -122,16 +130,19 @@ export class Chat implements OnInit {
               list.map((c) =>
                 c.id === sel
                   ? { ...c, messages: [...(c.messages ?? []), created] }
-                  : c,
-              ),
+                  : c
+              )
             );
             this.createForm.reset({ message: '' });
             queueMicrotask(() =>
               window.scrollTo({
                 top: document.body.scrollHeight,
                 behavior: 'smooth',
-              }),
+              })
             );
+          },
+          complete: () => {
+            this.loadingChat = false;
           },
         });
     } else {
@@ -151,8 +162,11 @@ export class Chat implements OnInit {
             window.scrollTo({
               top: document.body.scrollHeight,
               behavior: 'smooth',
-            }),
+            })
           );
+        },
+        complete: () => {
+          this.loadingChat = false;
         },
       });
     }
@@ -199,5 +213,17 @@ export class Chat implements OnInit {
     if (codeEl) {
       navigator.clipboard.writeText(codeEl.innerText || '');
     }
+  }
+
+  autoResize(event: Event) {
+    const textarea = event.target as HTMLTextAreaElement;
+    textarea.style.height = 'auto';
+    textarea.style.height = `${textarea.scrollHeight}px`;
+  }
+
+  handleEnter(e: any) {
+    if (e.shiftKey) return; // Shift+Enter: nueva línea
+    e.preventDefault();
+    this.sendMessage();
   }
 }

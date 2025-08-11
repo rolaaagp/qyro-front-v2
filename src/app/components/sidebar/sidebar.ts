@@ -1,6 +1,5 @@
 import {
   Component,
-  Input,
   signal,
   computed,
   EventEmitter,
