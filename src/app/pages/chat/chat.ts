@@ -44,7 +44,7 @@ export class Chat implements OnInit {
   hasMessages = computed(() => this.selectedMessages().length > 0);
 
   confirm = signal<{ open: boolean; id: number | null; action: ConfirmAction }>(
-    { open: false, id: null, action: 'remove-chip' }
+    { open: false, id: null, action: 'remove-chip' },
   );
 
   createForm = new FormGroup({
@@ -104,7 +104,7 @@ export class Chat implements OnInit {
     this.chatService.getAllMessages(id).subscribe({
       next: (messages: IMessages[]) => {
         this.chips.update((list) =>
-          list.map((c) => (c.id === id ? { ...c, messages } : c))
+          list.map((c) => (c.id === id ? { ...c, messages } : c)),
         );
       },
     });
@@ -124,7 +124,7 @@ export class Chat implements OnInit {
         .pipe(
           finalize(() => {
             this.loadingChat = false;
-          })
+          }),
         )
         .subscribe({
           next: (created) => {
@@ -132,15 +132,15 @@ export class Chat implements OnInit {
               list.map((c) =>
                 c.id === sel
                   ? { ...c, messages: [...(c.messages ?? []), created] }
-                  : c
-              )
+                  : c,
+              ),
             );
             this.createForm.reset({ message: '' });
             queueMicrotask(() =>
               window.scrollTo({
                 top: document.body.scrollHeight,
                 behavior: 'smooth',
-              })
+              }),
             );
           },
           error: () => {},
@@ -152,7 +152,7 @@ export class Chat implements OnInit {
         .pipe(
           finalize(() => {
             this.loadingChat = false;
-          })
+          }),
         )
         .subscribe({
           next: (created) => {
@@ -169,7 +169,7 @@ export class Chat implements OnInit {
               window.scrollTo({
                 top: document.body.scrollHeight,
                 behavior: 'smooth',
-              })
+              }),
             );
           },
           error: () => {},
