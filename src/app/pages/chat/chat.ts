@@ -9,7 +9,7 @@ import { CommonModule } from '@angular/common';
 import { Chips } from '@components/chips/chips';
 import type { Chip } from '@interfaces/chip.interface';
 import { ChatService } from '@services/chat';
-import { retry } from 'rxjs';
+import { finalize, retry } from 'rxjs';
 import { UserContextService } from '@context/user.context';
 import { IChat, IMessages } from '@interfaces/chat.interface';
 import { HighlightPipe } from '@pipes/highlight.pipe';
@@ -44,7 +44,7 @@ export class Chat implements OnInit {
   hasMessages = computed(() => this.selectedMessages().length > 0);
 
   confirm = signal<{ open: boolean; id: number | null; action: ConfirmAction }>(
-    { open: false, id: null, action: 'remove-chip' },
+    { open: false, id: null, action: 'remove-chip' }
   );
 
   createForm = new FormGroup({
@@ -84,6 +84,7 @@ export class Chat implements OnInit {
         message: payload.title,
         username: UserContextService.user?.username as string,
       })
+      .pipe(finalize(() => (this.loadingChat = false)))
       .subscribe({
         next: (created) => {
           const title = created.chat?.title as string;
@@ -92,9 +93,6 @@ export class Chat implements OnInit {
             ...list,
           ]);
           this.createForm.reset({ message: '' });
-        },
-        complete: () => {
-          this.loadingChat = false;
         },
       });
   }
@@ -106,7 +104,7 @@ export class Chat implements OnInit {
     this.chatService.getAllMessages(id).subscribe({
       next: (messages: IMessages[]) => {
         this.chips.update((list) =>
-          list.map((c) => (c.id === id ? { ...c, messages } : c)),
+          list.map((c) => (c.id === id ? { ...c, messages } : c))
         );
       },
     });
@@ -118,60 +116,66 @@ export class Chat implements OnInit {
     if (!content) return;
 
     this.loadingChat = true;
-
     const sel = this.selectedId();
 
     if (sel !== null) {
       this.chatService
         .createMessage({ chat_id: sel, message: content })
+        .pipe(
+          finalize(() => {
+            this.loadingChat = false;
+          })
+        )
         .subscribe({
-          next: (created: IMessages) => {
+          next: (created) => {
             this.chips.update((list) =>
               list.map((c) =>
                 c.id === sel
                   ? { ...c, messages: [...(c.messages ?? []), created] }
-                  : c,
-              ),
+                  : c
+              )
             );
             this.createForm.reset({ message: '' });
             queueMicrotask(() =>
               window.scrollTo({
                 top: document.body.scrollHeight,
                 behavior: 'smooth',
-              }),
+              })
             );
           },
-          complete: () => {
-            this.loadingChat = false;
-          },
+          error: () => {},
         });
     } else {
       const username = UserContextService.user?.username ?? 'anon';
-      this.chatService.create({ message: content, username }).subscribe({
-        next: (created: IMessages) => {
-          const chat = created.chat as IChat;
-          const title = chat.title;
-          const newId = chat.id;
-          this.chips.update((list) => [
-            { id: newId, title, messages: [created] },
-            ...list,
-          ]);
-          this.selectedId.set(newId);
-          this.createForm.reset({ message: '' });
-          queueMicrotask(() =>
-            window.scrollTo({
-              top: document.body.scrollHeight,
-              behavior: 'smooth',
-            }),
-          );
-        },
-        complete: () => {
-          this.loadingChat = false;
-        },
-      });
+      this.chatService
+        .create({ message: content, username })
+        .pipe(
+          finalize(() => {
+            this.loadingChat = false;
+          })
+        )
+        .subscribe({
+          next: (created) => {
+            const chat = created.chat as IChat;
+            const title = chat.title;
+            const newId = chat.id;
+            this.chips.update((list) => [
+              { id: newId, title, messages: [created] },
+              ...list,
+            ]);
+            this.selectedId.set(newId);
+            this.createForm.reset({ message: '' });
+            queueMicrotask(() =>
+              window.scrollTo({
+                top: document.body.scrollHeight,
+                behavior: 'smooth',
+              })
+            );
+          },
+          error: () => {},
+        });
     }
   }
-
   onRemoveChipRequest(id: number): void {
     this.confirm.set({ open: true, id, action: 'delete-chat' });
   }
